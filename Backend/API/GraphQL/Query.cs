@@ -1,23 +1,20 @@
 using Core.Entities;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 
 namespace API.GraphQL
 {
     public class Query
     {
-
-        public IQueryable<Customer> GetCustomers([Service] OMAContext context){
-
-            context.Database.EnsureCreated();
-            return context.Customers
-                .Include(o => o.Orders)
-                .Include(a => a.Address);
+        [UseFiltering]
+        public IQueryable<Customer> GetCustomers([Service] ICustomerService customerService)
+        {
+            return customerService.GetCustomersAndOrders();
         }
 
-        public IQueryable<Order> GetOrders([Service] OMAContext context){
-            context.Database.EnsureCreated();
-            return context.Orders.Include(c=>c.Customer);
+        [UseFiltering]
+        public IQueryable<Order> GetOrders([Service] IOrderService orderService)
+        {
+            return orderService.GetOrders();
         }
     }
 }

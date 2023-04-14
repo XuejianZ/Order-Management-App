@@ -2,6 +2,8 @@ using API.GraphQL;
 using GraphQL.Server.Ui.Voyager;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Services;
+using Core.Interfaces;
 
 var AllowSpecificOrigns = "_allowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<OMAContext>(options => {
     options.UseInMemoryDatabase("InMemoryDB");
 });
-
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 //graphql
 builder.Services
  .AddGraphQLServer()
@@ -22,6 +25,17 @@ builder.Services
 /*builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 */
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: AllowSpecificOrigns,
+        policy => 
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 /* Configure the HTTP request pipeline.
